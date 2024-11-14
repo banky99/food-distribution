@@ -16,9 +16,9 @@ router.get('/', (req, res) => {
 
 // Add New Food Request
 router.post('/', (req, res) => {
-    const { beneficiary_id, food_item_id, quantity_requested, request_date } = req.body;
-    const sql = 'INSERT INTO FoodRequests (beneficiary_id, food_item_id, quantity_requested, request_date) VALUES (?, ?, ?, ?)';
-    db.query(sql, [beneficiary_id, food_item_id, quantity_requested, request_date], (err, result) => {
+    const { beneficiary_id, food_type, quantity, request_date, status } = req.body;
+    const sql = 'INSERT INTO FoodRequests (beneficiary_id, food_type, quantity, request_date, status) VALUES (?, ?, ?, ?, ?)';
+    db.query(sql, [beneficiary_id, food_type, quantity, request_date, status], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
 // Update Food Request
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { beneficiary_id, food_item_id, quantity_requested, request_date } = req.body;
-    const sql = 'UPDATE FoodRequests SET beneficiary_id = ?, food_item_id = ?, quantity_requested = ?, request_date = ? WHERE id = ?';
-    db.query(sql, [beneficiary_id, food_item_id, quantity_requested, request_date, id], (err) => {
+    const { beneficiary_id, food_type, quantity, request_date, status } = req.body;
+    const sql = 'UPDATE FoodRequests SET beneficiary_id = ?, food_type = ?, quantity = ?, request_date = ?, status = ? WHERE request_id = ?';
+    db.query(sql, [beneficiary_id, food_type, quantity, request_date, status, id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -44,7 +44,7 @@ router.put('/:id', (req, res) => {
 // Delete Food Request
 router.delete('/:id', (req, res) => {
     const { id } = req.params;
-    const sql = 'DELETE FROM FoodRequests WHERE id = ?';
+    const sql = 'DELETE FROM FoodRequests WHERE request_id = ?';
     db.query(sql, [id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });

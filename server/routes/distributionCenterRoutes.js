@@ -16,9 +16,9 @@ router.get('/', (req, res) => {
 
 // Add New Distribution Center
 router.post('/', (req, res) => {
-    const { name, location, capacity } = req.body;
-    const sql = 'INSERT INTO DistributionCenters (name, location, capacity) VALUES (?, ?, ?)';
-    db.query(sql, [name, location, capacity], (err, result) => {
+    const { location, storage_capacity, contact_info } = req.body;
+    const sql = 'INSERT INTO DistributionCenters (location, storage_capacity, contact_info) VALUES (?, ?, ?)';
+    db.query(sql, [location, storage_capacity, contact_info], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
 // Update Distribution Center
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { name, location, capacity } = req.body;
-    const sql = 'UPDATE DistributionCenters SET name = ?, location = ?, capacity = ? WHERE id = ?';
-    db.query(sql, [name, location, capacity, id], (err) => {
+    const { location, storage_capacity, contact_info } = req.body;
+    const sql = 'UPDATE DistributionCenters SET location = ?, storage_capacity = ?, contact_info = ? WHERE center_id = ?';
+    db.query(sql, [location, storage_capacity, contact_info, id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -40,6 +40,7 @@ router.put('/:id', (req, res) => {
         }
     });
 });
+
 
 // Delete Distribution Center
 router.delete('/:id', (req, res) => {

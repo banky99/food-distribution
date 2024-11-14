@@ -16,9 +16,9 @@ router.get('/', (req, res) => {
 
 // Add New Community Garden
 router.post('/', (req, res) => {
-    const { name, location, capacity } = req.body;
-    const sql = 'INSERT INTO CommunityGardens (name, location, capacity) VALUES (?, ?, ?)';
-    db.query(sql, [name, location, capacity], (err, result) => {
+    const { location, crop_type, yield_amount, harvest_date } = req.body;
+    const sql = 'INSERT INTO CommunityGardens (location, crop_type, yield_amount, harvest_date) VALUES (?, ?, ?, ?)';
+    db.query(sql, [location, crop_type, yield_amount, harvest_date], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
 // Update Community Garden
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { name, location, capacity } = req.body;
-    const sql = 'UPDATE CommunityGardens SET name = ?, location = ?, capacity = ? WHERE id = ?';
-    db.query(sql, [name, location, capacity, id], (err) => {
+    const { location, crop_type, yield_amount, harvest_date } = req.body;
+    const sql = 'UPDATE CommunityGardens SET location = ?, crop_type = ?, yield_amount = ?, harvest_date = ? WHERE garden_id = ?';
+    db.query(sql, [location, crop_type, yield_amount, harvest_date, id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {

@@ -16,9 +16,9 @@ router.get('/', (req, res) => {
 
 // Add New Food Item
 router.post('/', (req, res) => {
-    const { name, quantity, expiry_date } = req.body;
-    const sql = 'INSERT INTO FoodInventory (name, quantity, expiry_date) VALUES (?, ?, ?)';
-    db.query(sql, [name, quantity, expiry_date], (err, result) => {
+    const { food_type, quantity, expiration_date, status, distribution_center_id } = req.body;
+    const sql = 'INSERT INTO FoodInventory (food_type, quantity, expiration_date, status, distribution_center_id) VALUES (?, ?, ?, ?, ?)';
+    db.query(sql, [food_type, quantity, expiration_date, status, distribution_center_id], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
 // Update Food Item
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { name, quantity, expiry_date } = req.body;
-    const sql = 'UPDATE FoodInventory SET name = ?, quantity = ?, expiry_date = ? WHERE id = ?';
-    db.query(sql, [name, quantity, expiry_date, id], (err) => {
+    const { food_type, quantity, expiration_date, status, distribution_center_id } = req.body;
+    const sql = 'UPDATE FoodInventory SET food_type = ?, quantity = ?, expiration_date = ?, status = ?, distribution_center_id = ? WHERE inventory_id = ?';
+    db.query(sql, [food_type, quantity, expiration_date, status, distribution_center_id, id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {

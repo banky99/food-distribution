@@ -1,6 +1,15 @@
-// src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Removed Link as it's not used
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+// Import Navbar and Footer
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+// Import HomePage
+import HomePage from './components/HomePage';
+
+// Import form components
 import DonorForm from './components/DonorForm';
 import BeneficiaryForm from './components/BeneficiaryForm';
 import FoodInventoryForm from './components/FoodInventoryForm';
@@ -9,55 +18,64 @@ import DeliveryForm from './components/DeliveryForm';
 import VolunteerForm from './components/VolunteerForm';
 import FoodRequestForm from './components/FoodRequestForm';
 import CommunityGardenForm from './components/CommunityGardenForm';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
-const App = () => {
-    return (
-        <Router>
-            <div className="container">
-                <h1>Community Food Network</h1>
-                <nav className="mb-4">
-                    <ul className="nav nav-pills">
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/">Donor</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/beneficiary">Beneficiary</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/food-inventory">Food Inventory</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/distribution-center">Distribution Center</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/delivery">Delivery</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/volunteer">Volunteer</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/food-request">Food Request</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/community-garden">Community Garden</Link>
-                        </li>
-                    </ul>
-                </nav>
+// Import authentication components
+import AdminLogin from './components/auth/AdminLogin';
+import BeneficiaryLogin from './components/auth/BeneficiaryLogin';
+import DonorLogin from './components/auth/DonorLogin';
+import VolunteerLogin from './components/auth/VolunteerLogin';
+import PasswordUpdate from './components/auth/PasswordUpdate';
+import Signup from './components/auth/Signup';
 
-                <Routes>
-                    <Route path="/" element={<DonorForm />} />
-                    <Route path="/beneficiary" element={<BeneficiaryForm />} />
-                    <Route path="/food-inventory" element={<FoodInventoryForm />} />
-                    <Route path="/distribution-center" element={<DistributionCenterForm />} />
-                    <Route path="/delivery" element={<DeliveryForm />} />
-                    <Route path="/volunteer" element={<VolunteerForm />} />
-                    <Route path="/food-request" element={<FoodRequestForm />} />
-                    <Route path="/community-garden" element={<CommunityGardenForm />} />
-                </Routes>
-            </div>
-        </Router>
-    );
-};
+// Import dashboards
+import AdminDashboard from './components/dashboard/AdminDashboard';
+import BeneficiaryDashboard from './components/dashboard/BeneficiaryDashboard';
+import DonorDashboard from './components/dashboard/DonorDashboard';
+import VolunteerDashboard from './components/dashboard/VolunteerDashboard';
+
+function App() {
+  return (
+    <Router>
+      {/* Navbar */}
+      <Navbar />
+
+      <div className="container mt-4">
+        <Routes>
+          {/* Home Page */}
+          <Route path="/" element={<HomePage />} />
+
+          {/* Forms Routes */}
+          <Route path="/donor" element={<DonorForm />} />
+          <Route path="/beneficiary" element={<BeneficiaryForm />} />
+          <Route path="/food-inventory" element={<FoodInventoryForm />} />
+          <Route path="/distribution-center" element={<DistributionCenterForm />} />
+          <Route path="/delivery" element={<DeliveryForm />} />
+          <Route path="/volunteer" element={<VolunteerForm />} />
+          <Route path="/food-request" element={<FoodRequestForm />} />
+          <Route path="/community-garden" element={<CommunityGardenForm />} />
+
+          {/* Authentication Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/beneficiary/login" element={<BeneficiaryLogin />} />
+          <Route path="/donor/login" element={<DonorLogin />} />
+          <Route path="/volunteer/login" element={<VolunteerLogin />} />
+
+          {/* Password Update Route */}
+          <Route path="/update-password" element={<PasswordUpdate />} />
+
+          {/* Dashboard Routes */}
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/beneficiary/dashboard" element={<BeneficiaryDashboard />} />
+          <Route path="/donor/dashboard" element={<DonorDashboard />} />
+          <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
+        </Routes>
+      </div>
+
+      {/* Footer */}
+      <Footer />
+    </Router>
+  );
+}
 
 export default App;

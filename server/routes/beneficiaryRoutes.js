@@ -44,7 +44,7 @@ router.put('/:id', (req, res) => {
 // Delete Beneficiary
 router.delete('/:id', (req, res) => {
     const { id } = req.params;
-    const sql = 'DELETE FROM Beneficiaries WHERE id = ?';
+    const sql = 'DELETE FROM Beneficiaries WHERE beneficiary_id ?';
     db.query(sql, [id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });

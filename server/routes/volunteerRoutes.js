@@ -16,9 +16,9 @@ router.get('/', (req, res) => {
 
 // Add New Volunteer
 router.post('/', (req, res) => {
-    const { name, contact_info, role } = req.body;
-    const sql = 'INSERT INTO Volunteers (name, contact_info, role) VALUES (?, ?, ?)';
-    db.query(sql, [name, contact_info, role], (err, result) => {
+    const { name, availability, roles, contact_info } = req.body;
+    const sql = 'INSERT INTO Volunteers (name, availability, roles, contact_info) VALUES (?, ?, ?, ?)';
+    db.query(sql, [name, availability, roles, contact_info], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -30,9 +30,9 @@ router.post('/', (req, res) => {
 // Update Volunteer
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { name, contact_info, role } = req.body;
-    const sql = 'UPDATE Volunteers SET name = ?, contact_info = ?, role = ? WHERE id = ?';
-    db.query(sql, [name, contact_info, role, id], (err) => {
+    const { name, availability, roles, contact_info } = req.body;
+    const sql = 'UPDATE Volunteers SET name = ?, availability = ?, roles = ?, contact_info = ? WHERE volunteer_id = ?';
+    db.query(sql, [name, availability, roles, contact_info, id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -44,7 +44,7 @@ router.put('/:id', (req, res) => {
 // Delete Volunteer
 router.delete('/:id', (req, res) => {
     const { id } = req.params;
-    const sql = 'DELETE FROM Volunteers WHERE id = ?';
+    const sql = 'DELETE FROM Volunteers WHERE volunteer_id = ?';
     db.query(sql, [id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
