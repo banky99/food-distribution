@@ -13,7 +13,7 @@ const PasswordUpdate = () => {
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/auth/update-password', { userType, email, oldPassword, newPassword });
+      const response = await axios.post('/auth/update-password', { userType, email, oldPassword, newPassword });
       alert(response.data.message);
     } catch (error) {
       alert('Password Update Failed');

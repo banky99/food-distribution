@@ -13,7 +13,7 @@ const BeneficiaryDashboard = () => {
     // Fetch food requests for the logged-in beneficiary
     const fetchFoodRequests = async () => {
       try {
-        const response = await axios.get('/api/food-requests');
+        const response = await axios.get('/food-requests');
         setFoodRequests(response.data);
       } catch (error) {
         console.error('Error fetching food requests:', error);

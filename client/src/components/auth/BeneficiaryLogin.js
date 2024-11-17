@@ -13,7 +13,7 @@ const BeneficiaryLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/auth/login', { userType: 'beneficiary', email, password });
+      const response = await axios.post('/auth/login', { userType: 'beneficiary', email, password });
       alert(response.data.message);
       navigate('/beneficiary/dashboard');
     } catch (error) {

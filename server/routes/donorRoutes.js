@@ -17,8 +17,8 @@ router.get('/', (req, res) => {
 // Add New Donor
 router.post('/', (req, res) => {
     const { name, contact_info, donation_frequency, preferred_food_types } = req.body;
-    const sql = 'INSERT INTO Donors (name, contact_info, donation_frequency, preferred_food_types) VALUES (?, ?, ?, ?)';
-    db.query(sql, [name, contact_info, donation_frequency, preferred_food_types], (err, result) => {
+    const sql = 'INSERT INTO Donors (name, email, donation_frequency, preferred_food_types) VALUES (?, ?, ?, ?)';
+    db.query(sql, [name, email, donation_frequency, preferred_food_types], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {

@@ -13,7 +13,7 @@ const VolunteerDashboard = () => {
     // Fetch deliveries for the logged-in volunteer
     const fetchDeliveries = async () => {
       try {
-        const response = await axios.get('/api/deliveries');
+        const response = await axios.get('/deliveries');
         setDeliveries(response.data);
       } catch (error) {
         console.error('Error fetching deliveries:', error);

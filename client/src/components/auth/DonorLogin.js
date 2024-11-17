@@ -13,7 +13,7 @@ const DonorLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/auth/login', { userType: 'donor', email, password });
+      const response = await axios.post('/auth/login', { userType: 'donor', email, password });
       alert(response.data.message);
       navigate('/donor/dashboard');
     } catch (error) {

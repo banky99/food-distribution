@@ -13,7 +13,7 @@ const VolunteerLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/auth/login', { userType: 'volunteer', email, password });
+      const response = await axios.post('/auth/login', { userType: 'volunteer', email, password });
       alert(response.data.message);
       navigate('/volunteer/dashboard');
     } catch (error) {

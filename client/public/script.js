@@ -2,7 +2,7 @@
 
 // DELIVERIES API CALLS
 function fetchDeliveries() {
-    fetch('/api/deliveries')
+    fetch('/deliveries')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('deliveryList');
@@ -23,7 +23,7 @@ document.getElementById('deliveryForm').onsubmit = function (e) {
         distribution_center_id: document.getElementById('deliveryCenterId').value,
         delivery_date: document.getElementById('deliveryDate').value
     };
-    fetch('/api/deliveries', {
+    fetch('/deliveries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -32,7 +32,7 @@ document.getElementById('deliveryForm').onsubmit = function (e) {
 
 // VOLUNTEERS API CALLS
 function fetchVolunteers() {
-    fetch('/api/volunteers')
+    fetch('/volunteers')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('volunteerList');
@@ -52,7 +52,7 @@ document.getElementById('volunteerForm').onsubmit = function (e) {
         contact_info: document.getElementById('volunteerContact').value,
         role: document.getElementById('volunteerRole').value
     };
-    fetch('/api/volunteers', {
+    fetch('/volunteers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -61,7 +61,7 @@ document.getElementById('volunteerForm').onsubmit = function (e) {
 
 // FOOD REQUESTS API CALLS
 function fetchFoodRequests() {
-    fetch('/api/food-requests')
+    fetch('/food-requests')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('foodRequestList');
@@ -82,7 +82,7 @@ document.getElementById('foodRequestForm').onsubmit = function (e) {
         quantity: document.getElementById('requestQuantity').value,
         request_date: document.getElementById('requestDate').value
     };
-    fetch('/api/food-requests', {
+    fetch('/food-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -91,7 +91,7 @@ document.getElementById('foodRequestForm').onsubmit = function (e) {
 
 // COMMUNITY GARDENS API CALLS
 function fetchCommunityGardens() {
-    fetch('/api/community-gardens')
+    fetch('/community-gardens')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('gardenList');
@@ -111,7 +111,7 @@ document.getElementById('gardenForm').onsubmit = function (e) {
         location: document.getElementById('gardenLocation').value,
         capacity: document.getElementById('gardenCapacity').value
     };
-    fetch('/api/community-gardens', {
+    fetch('/community-gardens', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -123,7 +123,7 @@ document.getElementById('gardenForm').onsubmit = function (e) {
 
 // BENEFICIARY API CALLS
 function fetchBeneficiaries() {
-    fetch('/api/beneficiaries')
+    fetch('/beneficiaries')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('beneficiaryList');
@@ -142,7 +142,7 @@ document.getElementById('beneficiaryForm').onsubmit = function (e) {
         name: document.getElementById('beneficiaryName').value,
         contact_info: document.getElementById('beneficiaryContact').value
     };
-    fetch('/api/beneficiaries', {
+    fetch('/beneficiaries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -151,7 +151,7 @@ document.getElementById('beneficiaryForm').onsubmit = function (e) {
 
 // DISTRIBUTION CENTER API CALLS
 function fetchDistributionCenters() {
-    fetch('/api/distribution-centers')
+    fetch('/distribution-centers')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('distributionCenterList');
@@ -170,7 +170,7 @@ document.getElementById('distributionCenterForm').onsubmit = function (e) {
         name: document.getElementById('centerName').value,
         location: document.getElementById('centerLocation').value
     };
-    fetch('/api/distribution-centers', {
+    fetch('/distribution-centers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -179,7 +179,7 @@ document.getElementById('distributionCenterForm').onsubmit = function (e) {
 
 // DONOR API CALLS
 function fetchDonors() {
-    fetch('/api/donors')
+    fetch('/donors')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('donorList');
@@ -198,7 +198,7 @@ document.getElementById('donorForm').onsubmit = function (e) {
         name: document.getElementById('donorName').value,
         contact_info: document.getElementById('donorContact').value
     };
-    fetch('/api/donors', {
+    fetch('/donors', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -207,7 +207,7 @@ document.getElementById('donorForm').onsubmit = function (e) {
 
 // FOOD INVENTORY API CALLS
 function fetchFoodInventory() {
-    fetch('/api/food-inventory')
+    fetch('/food-inventory')
         .then(response => response.json())
         .then(data => {
             const list = document.getElementById('foodInventoryList');
@@ -226,7 +226,7 @@ document.getElementById('foodInventoryForm').onsubmit = function (e) {
         name: document.getElementById('foodItemName').value,
         quantity: document.getElementById('quantity').value
     };
-    fetch('/api/food-inventory', {
+    fetch('/food-inventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

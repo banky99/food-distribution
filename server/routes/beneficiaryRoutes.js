@@ -17,8 +17,8 @@ router.get('/', (req, res) => {
 // Add New Beneficiary
 router.post('/', (req, res) => {
     const { name, contact_info, location, dietary_restrictions, allergies, food_preferences } = req.body;
-    const sql = 'INSERT INTO Beneficiaries (name, contact_info, location, dietary_restrictions, allergies, food_preferences) VALUES (?, ?, ?, ?, ?, ?)';
-    db.query(sql, [name, contact_info, location, dietary_restrictions, allergies, food_preferences], (err, result) => {
+    const sql = 'INSERT INTO Beneficiaries (name, email, location, dietary_restrictions, allergies, food_preferences) VALUES (?, ?, ?, ?, ?, ?)';
+    db.query(sql, [name, email, location, dietary_restrictions, allergies, food_preferences], (err, result) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {
@@ -31,8 +31,8 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
     const { id } = req.params;
     const { name, contact_info, location, dietary_restrictions, allergies, food_preferences } = req.body;
-    const sql = 'UPDATE Beneficiaries SET name = ?, contact_info = ?, location = ?, dietary_restrictions = ?, allergies = ?, food_preferences = ? WHERE beneficiary_id = ?';
-    db.query(sql, [name, contact_info, location, dietary_restrictions, allergies, food_preferences, id], (err) => {
+    const sql = 'UPDATE Beneficiaries SET name = ?, email = ?, location = ?, dietary_restrictions = ?, allergies = ?, food_preferences = ? WHERE beneficiary_id = ?';
+    db.query(sql, [name, email, location, dietary_restrictions, allergies, food_preferences, id], (err) => {
         if (err) {
             res.status(500).send({ error: 'Database error' });
         } else {

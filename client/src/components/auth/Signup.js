@@ -1,4 +1,3 @@
-// src/components/Signup.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ const Signup = () => {
     name: '',
     email: '',
     password: '',
-    role: 'beneficiary', // default role
+    userType: 'beneficiary', // default userType
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -26,7 +25,9 @@ const Signup = () => {
     e.preventDefault();
     setError(''); // Reset error message
     try {
-      const response = await axios.post('/api/auth/signup', user);
+      // Make sure you send the full URL to the backend
+      const response = await axios.post('http://localhost:3000/auth/signup', user);
+    
       if (response.status === 201) {
         alert('Signup successful!');
         navigate('/login'); // Redirect to the login page
@@ -90,12 +91,12 @@ const Signup = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="role" className="form-label">Select Role</label>
+          <label htmlFor="userType" className="form-label">Select Role</label>
           <select
             className="form-control"
-            id="role"
-            name="role"
-            value={user.role}
+            id="userType"
+            name="userType"
+            value={user.userType}
             onChange={handleChange}
             required
           >

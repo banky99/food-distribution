@@ -8,12 +8,17 @@ const db = require('./db');
 dotenv.config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = process.env.PORT || 3002; // Set the default to 3002
+const PORT = process.env.PORT || 3000; // Set the default to 3000
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://192.168.56.1:3000'], // Add both frontend URLs if needed
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(bodyParser.json()); // Use body-parser to parse JSON requests
 app.use(bodyParser.urlencoded({ extended: true })); // To parse URL-encoded data
+
 
 // Load all routes
 const donorRoutes = require('./routes/donorRoutes');
@@ -27,7 +32,7 @@ const communityGardenRoutes = require('./routes/communityGardenRoutes');
 const authRoutes = require('./routes/authRoutes'); // New Authentication Routes
 
 // Use routes for each entity
-app.use('/api/auth', authRoutes); // Authentication Routes
+app.use('/auth', authRoutes); // Authentication Routes
 app.use('/donors', donorRoutes);
 app.use('/beneficiaries', beneficiaryRoutes);
 app.use('/food-inventory', foodInventoryRoutes);
@@ -52,3 +57,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Server is running on http://127.0.0.1:${PORT}`);
 });
+
+//app.listen(PORT, '0.0.0.0', () => {
+  //console.log(`Server is running on http://0.0.0.0:${PORT}`);
+//});
