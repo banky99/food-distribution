@@ -13,7 +13,7 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/auth/login', { userType: 'admin', email, password });
+      const response = await axios.post('http://localhost:3000/auth/login', { userType: 'admin', email, password });
       alert(response.data.message);
       navigate('/admin/dashboard');
     } catch (error) {
