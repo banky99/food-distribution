@@ -4,6 +4,8 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
 const db = require('./db');
+const session = require('express-session');
+
 
 dotenv.config(); // Load environment variables from .env file
 
@@ -12,12 +14,13 @@ const PORT = process.env.PORT || 3000; // Set the default to 3000
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://192.168.56.1:3000'], // Add both frontend URLs if needed
+  origin: ['http://localhost:3000', 'http://192.168.56.1:3000','http://172.26.0.1:3000'], // Add both frontend URLs if needed
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  
 }));
-app.use(bodyParser.json()); // Use body-parser to parse JSON requests
-app.use(bodyParser.urlencoded({ extended: true })); // To parse URL-encoded data
+app.use(bodyParser.json({ limit: '1mb' })); // Use body-parser to parse JSON requests
+app.use(bodyParser.urlencoded({ limit: '1mb', extended: true })); // To parse URL-encoded data
 
 
 // Load all routes
