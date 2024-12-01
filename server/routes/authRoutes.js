@@ -2,15 +2,14 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const db = require('../db');
-const User = require('../models/User');
 
 // Middleware to check if the user is authenticated
 const isAuthenticated = (req, res, next) => {
-  if (req.session.user) {
-    next(); // Session is valid
-  } else {
-    res.status(401).json({ error: 'Unauthorized. Please log in.' });
-  }
+    if (req.session.user) {
+        next(); // Session is valid
+    } else {
+        res.status(401).json({ error: 'Unauthorized. Please log in.' });
+    }
 };
 
 // Helper function to determine the table based on userType
@@ -81,7 +80,7 @@ router.post('/login', async (req, res) => {
 
             // Store user data in session
             req.session.user = {
-                id: user.id,
+                id: user.beneficiary_id, // Store beneficiary_id explicitly
                 userType,
             };
 
@@ -91,7 +90,7 @@ router.post('/login', async (req, res) => {
                     console.error('Error saving session:', err);
                     return res.status(500).send({ error: 'Session save failed' });
                 }
-                res.send({ message: 'Login successful', user: { id: user.id, userType } });
+                res.send({ message: 'Login successful', user: { id: user.beneficiary_id, userType } });
             });
         });
     } catch (err) {
@@ -113,9 +112,9 @@ router.post('/logout', (req, res) => {
 
 // Profile Route
 router.get('/profile', isAuthenticated, (req, res) => {
-    const { userType, id } = req.session.user;
+    const { userType, id } = req.session.user; // Use `id` from session
     const table = getUserTable(userType); // Validate table name
-    const sql = `SELECT * FROM ${table} WHERE beneficiary_id = ?`;
+    const sql = `SELECT * FROM ${table} WHERE beneficiary_id = ?`; // Match the `beneficiary_id` schema
 
     db.query(sql, [id], (err, result) => {
         if (err) {
@@ -131,7 +130,7 @@ router.get('/profile', isAuthenticated, (req, res) => {
 
 // Update Profile Route
 router.put('/update-profile', isAuthenticated, (req, res) => {
-    const { userType, id } = req.session.user;
+    const { userType, id } = req.session.user; // Use `id` from session
     const { name, email, location, food_preferences } = req.body;
 
     if (!name || !email || !location || !food_preferences) {
@@ -139,7 +138,7 @@ router.put('/update-profile', isAuthenticated, (req, res) => {
     }
 
     const table = getUserTable(userType); // Validate table name
-    const updateSql = `UPDATE ${table} SET name = ?, email = ?, location = ?, food_preferences = ? WHERE id = ?`;
+    const updateSql = `UPDATE ${table} SET name = ?, email = ?, location = ?, food_preferences = ? WHERE beneficiary_id = ?`; // Use `beneficiary_id`
 
     db.query(updateSql, [name, email, location, food_preferences, id], (err) => {
         if (err) {
@@ -149,28 +148,5 @@ router.put('/update-profile', isAuthenticated, (req, res) => {
         res.send({ message: 'Profile updated successfully' });
     });
 });
-// Food Requests Route
-router.get('/food-requests', isAuthenticated, async (req, res) => {
-    try {
-      const { userType, id } = req.session.user;
-  
-// Fetch food requests for the logged-in user (beneficiary)
-    if (userType === 'beneficiary') {
-      const foodRequests = await FoodRequest.findAll({
-        where: { beneficiary_id: id }, // Adjust based on your schema
-      });
-
-      return res.json(foodRequests);
-    }
-
-    // Handle unauthorized access
-    return res.status(403).json({ error: 'Unauthorized access' });
-  } catch (error) {
-    console.error('Error fetching food requests:', error);
-    res.status(500).json({ error: 'Failed to fetch food requests' });
-  }
-});
-
-
 
 module.exports = router;

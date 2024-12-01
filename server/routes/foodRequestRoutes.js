@@ -14,22 +14,31 @@ router.get('/', (req, res) => {
     });
 });
 
-// Add New Food Request
+/// Add New Food Request
 router.post('/', (req, res) => {
-    const { beneficiary_id, food_type, quantity, request_date, status } = req.body;
-    console.log('Request Data:', req.body); // Log the request data
+    const { food_type, quantity, request_date, status } = req.body;
+
+    // Retrieve beneficiary_id from the session
+    const beneficiary_id = req.session.user?.id;
+
+    if (!beneficiary_id) {
+        console.error('Missing beneficiary_id in session');
+        return res.status(401).send({ error: 'Unauthorized: Beneficiary ID is missing' });
+    }
+
+    console.log('Request Data:', { beneficiary_id, food_type, quantity, request_date, status }); // Log the request data
+
     const sql = 'INSERT INTO FoodRequests (beneficiary_id, food_type, quantity, request_date, status) VALUES (?, ?, ?, ?, ?)';
     
     db.query(sql, [beneficiary_id, food_type, quantity, request_date, status], (err, result) => {
         if (err) {
             console.error('Database error:', err); // Log the actual error
-            res.status(500).send({ error: 'Database error', details: err.message });
-        } else {
-            res.status(201).send({ message: 'Food request added successfully', requestId: result.insertId });
+            return res.status(500).send({ error: 'Database error', details: err.message });
         }
+        
+        res.status(201).send({ message: 'Food request added successfully', requestId: result.insertId });
     });
 });
-
 // Update Food Request
 router.put('/:id', (req, res) => {
     const { id } = req.params;
