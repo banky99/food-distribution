@@ -23,7 +23,7 @@ app.use(
   })
 );
 
-app.use(bodyParser.json({ limit: '1mb' })); ts
+app.use(bodyParser.json({ limit: '1mb' })); 
 app.use(bodyParser.urlencoded({ limit: '1mb', extended: true })); 
 
 // Sequelize Store for Session Management
