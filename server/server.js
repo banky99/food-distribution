@@ -83,7 +83,7 @@ app.use('/food-inventory', foodInventoryRoutes);
 app.use('/distribution-centers', distributionCenterRoutes);
 app.use('/deliveries', deliveryRoutes);
 app.use('/volunteers', volunteerRoutes);
-app.use('/request-food', foodRequestRoutes);
+app.use('/food-requests', foodRequestRoutes);
 app.use('/community-gardens', communityGardenRoutes);
 
 // Default route for health check

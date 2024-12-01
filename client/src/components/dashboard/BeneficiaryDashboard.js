@@ -25,29 +25,29 @@ const BeneficiaryDashboard = () => {
   const verifySessionAndFetchData = async () => {
     setLoading(true);
     try {
-      // Verify session is active
-      const sessionResponse = await axios.get(`${API_BASE_URL}/check-session`, {
-        withCredentials: true,
-      });
-      console.log('Session data:', sessionResponse.data);
+        const sessionResponse = await axios.get(`${API_BASE_URL}/check-session`, { withCredentials: true });
+        console.log('Session data:', sessionResponse.data);
 
-      // Fetch dashboard data (food requests and profile)
-      const responses = await Promise.allSettled([
-        axios.get(`${API_BASE_URL}/food-requests`, { withCredentials: true }),
-        axios.get(`${API_BASE_URL}/profile`, { withCredentials: true }),
-      ]);
+        const [foodRequestsResponse, profileResponse] = await Promise.all([
+            axios.get(`${API_BASE_URL}/food-requests`, { withCredentials: true }).catch(() => null),
+            axios.get(`${API_BASE_URL}/profile`, { withCredentials: true }).catch(() => null),
+        ]);
 
-      // Set data if requests are successful
-      if (responses[0].status === "fulfilled") setFoodRequests(responses[0].value.data);
-      if (responses[1].status === "fulfilled") setProfile(responses[1].value.data);
+        if (foodRequestsResponse) {
+            console.log('Food Requests Response:', foodRequestsResponse.data); // Log response
+            setFoodRequests(foodRequestsResponse.data);
+        }
+        if (profileResponse) setProfile(profileResponse.data);
     } catch (error) {
-      console.error('Error fetching dashboard data or session expired:', error.response?.data || error.message);
-      alert('Session expired or unauthorized. Please log in again.');
-      navigate('/beneficiary/login');
+        console.error('Error fetching data or session expired:', error.response?.data || error.message);
+        alert('Session expired or unauthorized. Please log in again.');
+        navigate('/beneficiary/login');
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
+  
 
   // Use effect to verify session and fetch initial data
   useEffect(() => {
@@ -105,7 +105,7 @@ const BeneficiaryDashboard = () => {
         status: 'Pending',
       };
 
-      const response = await axios.post(`${API_BASE_URL}/request-food`, requestData, { withCredentials: true });
+      const response = await axios.post(`${API_BASE_URL}/food-requests`, requestData, { withCredentials: true });
 
       if (response.status === 201) {
         alert('Food request submitted successfully!');
@@ -185,16 +185,17 @@ const BeneficiaryDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {foodRequests.map((request, index) => (
-              <tr key={request.request_id}>
-                <td>{index + 1}</td>
-                <td>{request.food_type}</td>
-                <td>{request.quantity}</td>
-                <td>{new Date(request.request_date).toLocaleDateString()}</td>
-                <td>{request.status}</td>
-              </tr>
-            ))}
-          </tbody>
+  {foodRequests.map((request, index) => (
+    <tr key={request.request_id || index}>
+      <td>{index + 1}</td>
+      <td>{request.food_type || 'Unknown'}</td>
+      <td>{request.quantity || 'N/A'}</td>
+      <td>{request.request_date ? new Date(request.request_date).toLocaleDateString() : 'N/A'}</td>
+      <td>{request.status || 'N/A'}</td>
+    </tr>
+  ))}
+</tbody>
+
         </table>
       )}
 
