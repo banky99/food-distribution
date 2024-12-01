@@ -7,8 +7,6 @@ import '../../styles/Dashboard.css';
 // Clear Axios default headers to prevent bloating
 axios.defaults.headers.common = {};
 axios.defaults.headers.post['Content-Type'] = 'application/json';
-console.log('Headers being sent:', axios.defaults.headers.common);
-
 
 const BeneficiaryDashboard = () => {
   const [foodRequests, setFoodRequests] = useState([]);
@@ -20,60 +18,54 @@ const BeneficiaryDashboard = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const token = localStorage.getItem('token');
-  console.log('Token length:', token ? token.length : 'No token found');
+  // Session verification and data fetch function
+  const verifySessionAndFetchData = async () => {
+    setLoading(true);
+    try {
+      // Verify session is active
+      const sessionResponse = await axios.get('http://localhost:3001/check-session', {
+        withCredentials: true,
+      });
+      console.log('Session data:', sessionResponse.data);
 
-  // Ensure Authorization header is present globally
-  if (token) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    console.warn('No token found! Authorization header not set.');
-  }
+      
+       // Fetch dashboard data (food requests and profile)
+       const [foodRequestsResponse, profileResponse] = await Promise.all([
+        axios.get('http://localhost:3000/food-requests', { withCredentials: true }),
+        axios.get('http://localhost:3000/profile', { withCredentials: true }),
+      ]);
 
-  useEffect(() => {
-    if (!token) {
-      alert('Token is missing or expired. Please log in again.');
+      setFoodRequests(foodRequestsResponse.data);
+      setProfile(profileResponse.data);
+    } catch (error) {
+      console.error('Error fetching dashboard data or session expired:', error.response?.data || error.message);
+      alert('Session expired or unauthorized. Please log in again.');
       navigate('/beneficiary/login');
-      return;
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const fetchFoodRequests = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('/auth/food-requests');
-        setFoodRequests(response.data);
-      } catch (error) {
-        console.error('Error fetching food requests:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Use effect to verify session and fetch initial data
+  useEffect(() => {
+    verifySessionAndFetchData();
+  }, [navigate]);
 
-    const fetchProfile = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get('/auth/profile');
-        setProfile(response.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFoodRequests();
-    fetchProfile();
-  }, [token, navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/beneficiary/login');
+  const handleLogout = async () => {
+    try {
+      await axios.post('/logout', {}, { withCredentials: true });
+      alert('Logged out successfully.');
+      navigate('/beneficiary/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Failed to log out. Try again.');
+    }
   };
 
   const handleProfileUpdate = async () => {
     setLoading(true);
     try {
-      await axios.put('/auth/update-profile', profile);
+      await axios.put('/update-profile', profile, { withCredentials: true });
       alert('Profile updated successfully!');
       setShowProfileUpdate(false);
     } catch (error) {
@@ -87,7 +79,7 @@ const BeneficiaryDashboard = () => {
   const handlePasswordUpdate = async () => {
     setLoading(true);
     try {
-      await axios.post('/auth/update-password', passwords);
+      await axios.post('/update-password', passwords, { withCredentials: true });
       alert('Password updated successfully!');
       setShowPasswordUpdate(false);
     } catch (error) {
@@ -100,60 +92,32 @@ const BeneficiaryDashboard = () => {
 
   const handleFoodRequestSubmit = async (e) => {
     e.preventDefault();
-    const { food_type, quantity } = newFoodRequest;
-  
     setLoading(true);
-  
+
     try {
       const requestData = {
-        food_type,
-        quantity: parseInt(quantity),
+        ...newFoodRequest,
+        quantity: parseInt(newFoodRequest.quantity, 10),
         request_date: new Date().toISOString().split('T')[0],
         status: 'Pending',
       };
-  
-      console.log('Request Data:', requestData);
-  
-      const response = await axios.post(
-        'http://localhost:3000/auth/request-food', // Ensure correct backend URL
-        requestData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
+
+      const response = await axios.post('/request-food', requestData, { withCredentials: true });
+
       if (response.status === 201) {
         alert('Food request submitted successfully!');
         setFoodRequests([...foodRequests, response.data]);
         setNewFoodRequest({ food_type: '', quantity: '' });
       } else {
-        console.error('Unexpected response:', response);
         alert('Unexpected response from the server.');
       }
     } catch (error) {
       console.error('Error creating food request:', error);
-  
-      if (error.response) {
-        // Error from server
-        console.error('Server Error:', error.response.data);
-        alert(error.response.data.error || 'Server error occurred.');
-      } else if (error.request) {
-        // No response received
-        console.error('No Response:', error.request);
-        alert('No response from server. Check your connection.');
-      } else {
-        // Other errors
-        console.error('Error:', error.message);
-        alert('An unexpected error occurred.');
-      }
+      alert(error.response?.data?.error || 'Failed to create food request.');
     } finally {
       setLoading(false);
     }
   };
-  
-
 
   return (
     <div className="container mt-4">
@@ -177,9 +141,7 @@ const BeneficiaryDashboard = () => {
               id="foodType"
               className="form-control"
               value={newFoodRequest.food_type}
-              onChange={(e) =>
-                setNewFoodRequest({ ...newFoodRequest, food_type: e.target.value })
-              }
+              onChange={(e) => setNewFoodRequest({ ...newFoodRequest, food_type: e.target.value })}
               placeholder="Enter food type (e.g., rice, beans)"
               required
             />
@@ -193,9 +155,7 @@ const BeneficiaryDashboard = () => {
               id="quantity"
               className="form-control"
               value={newFoodRequest.quantity}
-              onChange={(e) =>
-                setNewFoodRequest({ ...newFoodRequest, quantity: e.target.value })
-              }
+              onChange={(e) => setNewFoodRequest({ ...newFoodRequest, quantity: e.target.value })}
               placeholder="Enter quantity needed"
               required
             />
@@ -206,32 +166,38 @@ const BeneficiaryDashboard = () => {
         </form>
       </div>
 
+      
       {/* Display Food Requests */}
-      <h3>Your Food Requests</h3>
-      <table className="table table-striped mt-3">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Food Type</th>
-            <th>Quantity</th>
-            <th>Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {foodRequests.map((request, index) => (
-            <tr key={request.request_id}>
-              <td>{index + 1}</td>
-              <td>{request.food_type}</td>
-              <td>{request.quantity}</td>
-              <td>{new Date(request.request_date).toLocaleDateString()}</td>
-              <td>{request.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+<h3>Your Food Requests</h3>
+{foodRequests.length === 0 ? (
+  <p>No food requests made yet.</p>
+) : (
+  <table className="table table-striped mt-3">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Food Type</th>
+        <th>Quantity</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {foodRequests.map((request, index) => (
+        <tr key={request.request_id}>
+          <td>{index + 1}</td>
+          <td>{request.food_type}</td>
+          <td>{request.quantity}</td>
+          <td>{new Date(request.request_date).toLocaleDateString()}</td>
+          <td>{request.status}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)}
 
-      {/* Profile Update */}
+
+      {/* Profile Update Section */}
       <button
         className="btn btn-info mt-4 w-100"
         onClick={() => setShowProfileUpdate(!showProfileUpdate)}
@@ -267,9 +233,7 @@ const BeneficiaryDashboard = () => {
             className="form-control mt-3"
             placeholder="Enter your food preferences"
             value={profile.food_preferences}
-            onChange={(e) =>
-              setProfile({ ...profile, food_preferences: e.target.value })
-            }
+            onChange={(e) => setProfile({ ...profile, food_preferences: e.target.value })}
           />
           <button className="btn btn-success mt-3" onClick={handleProfileUpdate}>
             Save Changes
@@ -277,7 +241,7 @@ const BeneficiaryDashboard = () => {
         </div>
       )}
 
-      {/* Password Update */}
+      {/* Password Update Section */}
       <button
         className="btn btn-warning mt-4 w-100"
         onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}
@@ -292,18 +256,14 @@ const BeneficiaryDashboard = () => {
             className="form-control mt-3"
             placeholder="Old Password"
             value={passwords.oldPassword}
-            onChange={(e) =>
-              setPasswords({ ...passwords, oldPassword: e.target.value })
-            }
+            onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
           />
           <input
             type="password"
             className="form-control mt-3"
             placeholder="New Password"
             value={passwords.newPassword}
-            onChange={(e) =>
-              setPasswords({ ...passwords, newPassword: e.target.value })
-            }
+            onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
           />
           <button className="btn btn-success mt-3" onClick={handlePasswordUpdate}>
             Change Password

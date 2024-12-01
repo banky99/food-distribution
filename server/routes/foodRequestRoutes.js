@@ -17,10 +17,13 @@ router.get('/', (req, res) => {
 // Add New Food Request
 router.post('/', (req, res) => {
     const { beneficiary_id, food_type, quantity, request_date, status } = req.body;
+    console.log('Request Data:', req.body); // Log the request data
     const sql = 'INSERT INTO FoodRequests (beneficiary_id, food_type, quantity, request_date, status) VALUES (?, ?, ?, ?, ?)';
+    
     db.query(sql, [beneficiary_id, food_type, quantity, request_date, status], (err, result) => {
         if (err) {
-            res.status(500).send({ error: 'Database error' });
+            console.error('Database error:', err); // Log the actual error
+            res.status(500).send({ error: 'Database error', details: err.message });
         } else {
             res.status(201).send({ message: 'Food request added successfully', requestId: result.insertId });
         }

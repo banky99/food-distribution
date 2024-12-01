@@ -1,4 +1,3 @@
-// src/components/auth/AdminLogin.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -6,19 +5,30 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../styles/Auth.css';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [credentials, setCredentials] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const { email, password } = credentials; 
       const response = await axios.post('http://localhost:3000/auth/login', { userType: 'admin', email, password });
-      alert(response.data.message);
-      navigate('/admin/dashboard');
+
+      if (response.status === 200) {
+        alert(response.data.message);
+        localStorage.setItem('token', response.data.token); 
+        navigate('/admin/dashboard');
+      }
     } catch (error) {
-      alert('Admin Login Failed');
+      const errorMessage =
+        error.response?.data?.error || 'Admin Login Failed. Please check your credentials and try again.';
+      alert(errorMessage);
     }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -27,13 +37,29 @@ const AdminLogin = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Email</label>
-          <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input
+            type="email"
+            name="email"
+            className="form-control"
+            value={credentials.email}
+            onChange={handleInputChange}
+            required
+          />
         </div>
         <div className="mb-3">
           <label>Password</label>
-          <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <input
+            type="password"
+            name="password"
+            className="form-control"
+            value={credentials.password}
+            onChange={handleInputChange}
+            required
+          />
         </div>
-        <button type="submit" className="btn btn-primary">Login</button>
+        <button type="submit" className="btn btn-primary">
+          Login
+        </button>
       </form>
     </div>
   );

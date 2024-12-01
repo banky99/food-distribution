@@ -13,20 +13,26 @@ const BeneficiaryLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Reset any previous error messages
+    setError(''); 
+
+    const data = {
+      email,
+      password,
+      userType: 'beneficiary', 
+    };
+
     try {
-      // Make sure the correct backend URL is used
-      const response = await axios.post('http://localhost:3000/auth/login', {
-        userType: 'beneficiary',
-        email,
-        password,
-      });
+      // Send login request to the backend
+      const response = await axios.post(
+        'http://localhost:3001/auth/login',
+        data,
+        { withCredentials: true } 
+      );
 
       // Check if login is successful
       if (response.status === 200) {
         alert(response.data.message);
-        // Save the token to local storage (if using JWT for authentication)
-        localStorage.setItem('token', response.data.token);
+        // Redirect the user to the beneficiary dashboard
         navigate('/beneficiary/dashboard');
       }
     } catch (error) {
@@ -34,7 +40,7 @@ const BeneficiaryLogin = () => {
       if (error.response && error.response.data && error.response.data.error) {
         setError(error.response.data.error);
       } else {
-        setError('Beneficiary Login Failed. Please check your credentials and try again.');
+        setError('Login failed. Please check your credentials and try again.');
       }
     }
   };
@@ -51,6 +57,7 @@ const BeneficiaryLogin = () => {
             className="form-control"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
             required
           />
         </div>
@@ -61,6 +68,7 @@ const BeneficiaryLogin = () => {
             className="form-control"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
             required
           />
         </div>

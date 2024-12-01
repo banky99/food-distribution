@@ -25,17 +25,19 @@ const Signup = () => {
     e.preventDefault();
     setError(''); // Reset error message
     try {
-      // Make sure you send the full URL to the backend
-      const response = await axios.post('http://localhost:3000/auth/signup', user);
-    
+      // Send the request to the backend
+      const response = await axios.post('http://localhost:3001/auth/signup', user, {
+        withCredentials: true, // Allow cookies (session) to be sent
+      });
+
       if (response.status === 201) {
         alert('Signup successful!');
         navigate('/login'); // Redirect to the login page
       }
     } catch (error) {
       // Handle errors and display a user-friendly message
-      if (error.response && error.response.data && error.response.data.message) {
-        setError(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.error) {
+        setError(error.response.data.error);
       } else {
         setError('Signup failed. Please try again.');
       }
