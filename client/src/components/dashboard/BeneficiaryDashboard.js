@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../styles/Dashboard.css';
 
+// API Base URL
+const API_BASE_URL = "http://localhost:3001";
+
 // Clear Axios default headers to prevent bloating
 axios.defaults.headers.common = {};
 axios.defaults.headers.post['Content-Type'] = 'application/json';
@@ -23,20 +26,20 @@ const BeneficiaryDashboard = () => {
     setLoading(true);
     try {
       // Verify session is active
-      const sessionResponse = await axios.get('http://localhost:3001/check-session', {
+      const sessionResponse = await axios.get(`${API_BASE_URL}/check-session`, {
         withCredentials: true,
       });
       console.log('Session data:', sessionResponse.data);
 
-      
-       // Fetch dashboard data (food requests and profile)
-       const [foodRequestsResponse, profileResponse] = await Promise.all([
-        axios.get('http://localhost:3000/food-requests', { withCredentials: true }),
-        axios.get('http://localhost:3000/profile', { withCredentials: true }),
+      // Fetch dashboard data (food requests and profile)
+      const responses = await Promise.allSettled([
+        axios.get(`${API_BASE_URL}/food-requests`, { withCredentials: true }),
+        axios.get(`${API_BASE_URL}/profile`, { withCredentials: true }),
       ]);
 
-      setFoodRequests(foodRequestsResponse.data);
-      setProfile(profileResponse.data);
+      // Set data if requests are successful
+      if (responses[0].status === "fulfilled") setFoodRequests(responses[0].value.data);
+      if (responses[1].status === "fulfilled") setProfile(responses[1].value.data);
     } catch (error) {
       console.error('Error fetching dashboard data or session expired:', error.response?.data || error.message);
       alert('Session expired or unauthorized. Please log in again.');
@@ -53,7 +56,7 @@ const BeneficiaryDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('/logout', {}, { withCredentials: true });
+      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
       alert('Logged out successfully.');
       navigate('/beneficiary/login');
     } catch (error) {
@@ -65,7 +68,7 @@ const BeneficiaryDashboard = () => {
   const handleProfileUpdate = async () => {
     setLoading(true);
     try {
-      await axios.put('/update-profile', profile, { withCredentials: true });
+      await axios.put(`${API_BASE_URL}/update-profile`, profile, { withCredentials: true });
       alert('Profile updated successfully!');
       setShowProfileUpdate(false);
     } catch (error) {
@@ -79,7 +82,7 @@ const BeneficiaryDashboard = () => {
   const handlePasswordUpdate = async () => {
     setLoading(true);
     try {
-      await axios.post('/update-password', passwords, { withCredentials: true });
+      await axios.post(`${API_BASE_URL}/update-password`, passwords, { withCredentials: true });
       alert('Password updated successfully!');
       setShowPasswordUpdate(false);
     } catch (error) {
@@ -102,7 +105,7 @@ const BeneficiaryDashboard = () => {
         status: 'Pending',
       };
 
-      const response = await axios.post('/request-food', requestData, { withCredentials: true });
+      const response = await axios.post(`${API_BASE_URL}/request-food`, requestData, { withCredentials: true });
 
       if (response.status === 201) {
         alert('Food request submitted successfully!');
@@ -166,36 +169,34 @@ const BeneficiaryDashboard = () => {
         </form>
       </div>
 
-      
       {/* Display Food Requests */}
-<h3>Your Food Requests</h3>
-{foodRequests.length === 0 ? (
-  <p>No food requests made yet.</p>
-) : (
-  <table className="table table-striped mt-3">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Food Type</th>
-        <th>Quantity</th>
-        <th>Date</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {foodRequests.map((request, index) => (
-        <tr key={request.request_id}>
-          <td>{index + 1}</td>
-          <td>{request.food_type}</td>
-          <td>{request.quantity}</td>
-          <td>{new Date(request.request_date).toLocaleDateString()}</td>
-          <td>{request.status}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-)}
-
+      <h3>Your Food Requests</h3>
+      {foodRequests.length === 0 ? (
+        <p>No food requests made yet.</p>
+      ) : (
+        <table className="table table-striped mt-3">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Food Type</th>
+              <th>Quantity</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {foodRequests.map((request, index) => (
+              <tr key={request.request_id}>
+                <td>{index + 1}</td>
+                <td>{request.food_type}</td>
+                <td>{request.quantity}</td>
+                <td>{new Date(request.request_date).toLocaleDateString()}</td>
+                <td>{request.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {/* Profile Update Section */}
       <button
@@ -266,7 +267,7 @@ const BeneficiaryDashboard = () => {
             onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
           />
           <button className="btn btn-success mt-3" onClick={handlePasswordUpdate}>
-            Change Password
+            Update Password
           </button>
         </div>
       )}
