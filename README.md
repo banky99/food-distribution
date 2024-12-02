@@ -43,16 +43,16 @@ Secure login and session management using express-session and Sequelize.
 **CORS:** For handling cross-origin requests.<br>
 
 **How It Works**<br>
-**User Registration and Login:**<br>
-Donors and beneficiaries create accounts and log in securely.
-**Food Donations:**<br>
-Donors can log food donations, specifying quantity, type, and expiration dates.
-**Food Distribution:**<br>
-Food is distributed based on beneficiaries' needs and preferences.
-**Volunteer Coordination:**<br>
-Volunteers are matched with tasks like food collection and distribution.
-**Community Gardens:**<br>
-Track and utilize produce from community gardens for beneficiaries.
+**User Registration and Login:**
+Donors and beneficiaries create accounts and log in securely.<br>
+**Food Donations:**
+Donors can log food donations, specifying quantity, type, and expiration dates.<br>
+**Food Distribution:**
+Food is distributed based on beneficiaries' needs and preferences.<br>
+**Volunteer Coordination:**
+Volunteers are matched with tasks like food collection and distribution.<br>
+**Community Gardens:**
+Track and utilize produce from community gardens for beneficiaries.<br>
 
 *Installation and Setup*
 *Clone the repository:*
