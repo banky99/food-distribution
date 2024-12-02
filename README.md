@@ -4,35 +4,45 @@ The Community Food Network is an application designed to tackle food insecurity 
 Features
 Donor Management:
 Register and manage donors, track their donations, and ensure transparency.
+
 Beneficiary Management:
 Maintain beneficiary profiles and their food preferences for targeted distribution.
+
 Food Inventory Tracking:
 Manage food stocks efficiently, including perishable and non-perishable items.
+
 Distribution Centers:
 Manage distribution centers and track the delivery of food to beneficiaries.
+
 Volunteer Coordination:
 Register and manage volunteers to assist in food collection and distribution.
+
 Food Requests and Matching:
 Facilitate food requests from beneficiaries and match them with available resources.
+
 Community Gardens:
 Track and manage resources grown in community gardens for additional food support.
+
 Authentication and Security:
 Secure login and session management using express-session and Sequelize.
+
 Tech Stack
 Backend
 Node.js: Fast and scalable runtime environment.
 Express.js: Framework for building the API.
 Sequelize: ORM for interacting with the MySQL database.
 MySQL: Database for storing application data.
+
 Frontend
 React.js: Framework for creating dynamic user interfaces.
 Bootstrap: Responsive design framework for styling.
-Additional Tools
+
+*Additional Tools*
 dotenv: For managing environment variables securely.
 bcrypt: For password hashing and security.
 CORS: For handling cross-origin requests.
 
-How It Works
+**How It Works**
 User Registration and Login:
 Donors and beneficiaries create accounts and log in securely.
 Food Donations:
