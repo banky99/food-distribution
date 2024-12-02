@@ -59,7 +59,7 @@ Track and utilize produce from community gardens for beneficiaries.<br>
 
 ```bash
 Copy code
-git clone https://github.com/username/community-food-network.git
+git clone https://github.com/banky99/food-distribution.git
 cd community-food-network
 Install dependencies:
 ```
