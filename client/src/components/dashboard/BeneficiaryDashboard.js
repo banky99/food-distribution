@@ -68,16 +68,18 @@ const BeneficiaryDashboard = () => {
   const handleProfileUpdate = async () => {
     setLoading(true);
     try {
-      await axios.put(`${API_BASE_URL}/update-profile`, profile, { withCredentials: true });
+      const response = await axios.put(`${API_BASE_URL}/update-profile`, profile, { withCredentials: true });
+      console.log('Profile update response:', response.data);
       alert('Profile updated successfully!');
       setShowProfileUpdate(false);
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('Error updating profile:', error.response?.data || error.message);
       alert('Profile update failed.');
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handlePasswordUpdate = async () => {
     setLoading(true);
@@ -244,34 +246,56 @@ const BeneficiaryDashboard = () => {
       )}
 
       {/* Password Update Section */}
-      <button
-        className="btn btn-warning mt-4 w-100"
-        onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}
-      >
+<button
+  className="btn btn-warning mt-4 w-100"
+  onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}
+>
+  Update Password
+</button>
+{showPasswordUpdate && (
+  <div className="card p-4 mt-3">
+    <h3>Change Password</h3>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault(); // Prevent default form submission
+        handlePasswordUpdate();
+      }}
+    >
+      <div className="mb-3">
+        <label htmlFor="oldPassword" className="form-label">
+          Old Password
+        </label>
+        <input
+          type="password"
+          id="oldPassword"
+          className="form-control"
+          placeholder="Old Password"
+          value={passwords.oldPassword}
+          onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
+          required
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="newPassword" className="form-label">
+          New Password
+        </label>
+        <input
+          type="password"
+          id="newPassword"
+          className="form-control"
+          placeholder="New Password"
+          value={passwords.newPassword}
+          onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+          required
+        />
+      </div>
+      <button className="btn btn-success mt-3" type="submit">
         Update Password
       </button>
-      {showPasswordUpdate && (
-        <div className="card p-4 mt-3">
-          <h3>Change Password</h3>
-          <input
-            type="password"
-            className="form-control mt-3"
-            placeholder="Old Password"
-            value={passwords.oldPassword}
-            onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
-          />
-          <input
-            type="password"
-            className="form-control mt-3"
-            placeholder="New Password"
-            value={passwords.newPassword}
-            onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-          />
-          <button className="btn btn-success mt-3" onClick={handlePasswordUpdate}>
-            Update Password
-          </button>
-        </div>
-      )}
+    </form>
+  </div>
+)}
+
     </div>
   );
 };

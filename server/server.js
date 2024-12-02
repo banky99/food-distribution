@@ -74,6 +74,7 @@ const volunteerRoutes = require('./routes/volunteerRoutes');
 const foodRequestRoutes = require('./routes/foodRequestRoutes');
 const communityGardenRoutes = require('./routes/communityGardenRoutes');
 const authRoutes = require('./routes/authRoutes'); 
+const profileRoutes = require('./routes/profileRoutes');
 
 // Use routes for each entity
 app.use('/auth', authRoutes);  
@@ -85,6 +86,7 @@ app.use('/deliveries', deliveryRoutes);
 app.use('/volunteers', volunteerRoutes);
 app.use('/food-requests', foodRequestRoutes);
 app.use('/community-gardens', communityGardenRoutes);
+app.use(profileRoutes);
 
 // Default route for health check
 app.get('/', (req, res) => {

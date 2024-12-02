@@ -128,25 +128,6 @@ router.get('/profile', isAuthenticated, (req, res) => {
     });
 });
 
-// Update Profile Route
-router.put('/update-profile', isAuthenticated, (req, res) => {
-    const { userType, id } = req.session.user; // Use `id` from session
-    const { name, email, location, food_preferences } = req.body;
 
-    if (!name || !email || !location || !food_preferences) {
-        return res.status(400).send({ error: 'All fields are required' });
-    }
-
-    const table = getUserTable(userType); // Validate table name
-    const updateSql = `UPDATE ${table} SET name = ?, email = ?, location = ?, food_preferences = ? WHERE beneficiary_id = ?`; // Use `beneficiary_id`
-
-    db.query(updateSql, [name, email, location, food_preferences, id], (err) => {
-        if (err) {
-            console.error('Profile update error:', err);
-            return res.status(500).send({ error: 'Profile update failed' });
-        }
-        res.send({ message: 'Profile updated successfully' });
-    });
-});
 
 module.exports = router;
