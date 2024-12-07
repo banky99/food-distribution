@@ -128,6 +128,46 @@ router.get('/profile', isAuthenticated, (req, res) => {
     });
 });
 
+router.post('/contribute', (req, res) => {
+    const { donor_id, food_inventory_id } = req.body;
+    
+    if (!donor_id || !food_inventory_id) {
+        return res.status(400).send({ error: 'Donor ID and Food Inventory ID are required.' });
+    }
+
+    const sql = 'INSERT INTO DonorContributions (donor_id, food_inventory_id, date_contributed) VALUES (?, ?, CURDATE())';
+    db.query(sql, [donor_id, food_inventory_id], (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: 'Database error: ' + err.message });
+        }
+
+        res.status(201).send({ message: 'Contribution recorded successfully', contributionId: result.insertId });
+    });
+});
+
+router.get('/donor/:donor_id', (req, res) => {
+    const { donor_id } = req.params;
+
+    const sql = `
+        SELECT fi.food_type, fi.quantity, fi.expiration_date, fi.status, dc.date_contributed
+        FROM DonorContributions dc
+        JOIN FoodInventory fi ON dc.food_inventory_id = fi.inventory_id
+        WHERE dc.donor_id = ?
+    `;
+    
+    db.query(sql, [donor_id], (err, results) => {
+        if (err) {
+            return res.status(500).send({ error: 'Database error: ' + err.message });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).send({ message: 'No donations found for this donor.' });
+        }
+
+        res.send(results);
+    });
+});
+
 
 
 module.exports = router;
