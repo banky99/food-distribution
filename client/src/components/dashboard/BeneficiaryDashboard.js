@@ -56,7 +56,7 @@ const BeneficiaryDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/logout`, {}, { withCredentials: true });
+      await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
       alert('Logged out successfully.');
       navigate('/beneficiary/login');
     } catch (error) {
