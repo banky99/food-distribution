@@ -7,10 +7,6 @@ import '../../styles/Dashboard.css';
 // API Base URL
 const API_BASE_URL = "http://localhost:3001";
 
-// Clear Axios default headers to prevent bloating
-axios.defaults.headers.common = {};
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-
 const BeneficiaryDashboard = () => {
   const [foodRequests, setFoodRequests] = useState([]);
   const [showProfileUpdate, setShowProfileUpdate] = useState(false);
@@ -18,40 +14,51 @@ const BeneficiaryDashboard = () => {
   const [profile, setProfile] = useState({ name: '', email: '', location: '', food_preferences: '' });
   const [passwords, setPasswords] = useState({ oldPassword: '', newPassword: '' });
   const [newFoodRequest, setNewFoodRequest] = useState({ food_type: '', quantity: '' });
+  const [availableFood, setAvailableFood] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Session verification and data fetch function
+  // Verify session and fetch data
   const verifySessionAndFetchData = async () => {
     setLoading(true);
     try {
-        const sessionResponse = await axios.get(`${API_BASE_URL}/check-session`, { withCredentials: true });
-        console.log('Session data:', sessionResponse.data);
+      const sessionResponse = await axios.get(`${API_BASE_URL}/check-session`, { withCredentials: true });
+      console.log('Session data:', sessionResponse.data);
 
-        const [foodRequestsResponse, profileResponse] = await Promise.all([
-            axios.get(`${API_BASE_URL}/food-requests`, { withCredentials: true }).catch(() => null),
-            axios.get(`${API_BASE_URL}/profile`, { withCredentials: true }).catch(() => null),
-        ]);
+      const [foodRequestsResponse, profileResponse] = await Promise.all([
+        axios.get(`${API_BASE_URL}/food-requests`, { withCredentials: true }).catch(() => null),
+        axios.get(`${API_BASE_URL}/profile`, { withCredentials: true }).catch(() => null),
+    ]);
 
-        if (foodRequestsResponse) {
-            console.log('Food Requests Response:', foodRequestsResponse.data); // Log response
-            setFoodRequests(foodRequestsResponse.data);
-        }
-        if (profileResponse) setProfile(profileResponse.data);
-    } catch (error) {
-        console.error('Error fetching data or session expired:', error.response?.data || error.message);
-        alert('Session expired or unauthorized. Please log in again.');
-        navigate('/beneficiary/login');
-    } finally {
-        setLoading(false);
-    }
+    if (foodRequestsResponse) {
+      console.log('Food Requests Response:', foodRequestsResponse.data); // Log response
+      setFoodRequests(foodRequestsResponse.data);
+  }
+  if (profileResponse) setProfile(profileResponse.data);
+} catch (error) {
+  console.error('Error fetching data or session expired:', error.response?.data || error.message);
+  alert('Session expired or unauthorized. Please log in again.');
+  navigate('/beneficiary/login');
+} finally {
+  setLoading(false);
+}
 };
 
-  
+  // Fetch available food items
+  const fetchAvailableFood = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/available-food`, { withCredentials: true });
+      setAvailableFood(response.data);
+    } catch (error) {
+      console.error('Error fetching available food:', error);
+      alert('Failed to load available food items.');
+    }
+  };
 
   // Use effect to verify session and fetch initial data
   useEffect(() => {
     verifySessionAndFetchData();
+    fetchAvailableFood();
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -79,9 +86,13 @@ const BeneficiaryDashboard = () => {
       setLoading(false);
     }
   };
-  
 
   const handlePasswordUpdate = async () => {
+    if (!passwords.oldPassword || !passwords.newPassword) {
+      alert('Both password fields are required!');
+      return;
+    }
+
     setLoading(true);
     try {
       await axios.post(`${API_BASE_URL}/update-password`, passwords, { withCredentials: true });
@@ -134,42 +145,44 @@ const BeneficiaryDashboard = () => {
       {loading && <div>Loading...</div>}
 
       {/* Food Request Form */}
-      <div className="card p-4 mb-4">
-        <h3>Request for Food</h3>
-        <form onSubmit={handleFoodRequestSubmit}>
-          <div className="mb-3">
-            <label htmlFor="foodType" className="form-label">
-              Food Type
-            </label>
-            <input
-              type="text"
-              id="foodType"
-              className="form-control"
-              value={newFoodRequest.food_type}
-              onChange={(e) => setNewFoodRequest({ ...newFoodRequest, food_type: e.target.value })}
-              placeholder="Enter food type (e.g., rice, beans)"
-              required
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="quantity" className="form-label">
-              Quantity
-            </label>
-            <input
-              type="number"
-              id="quantity"
-              className="form-control"
-              value={newFoodRequest.quantity}
-              onChange={(e) => setNewFoodRequest({ ...newFoodRequest, quantity: e.target.value })}
-              placeholder="Enter quantity needed"
-              required
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Submit Request
-          </button>
-        </form>
-      </div>
+      <form onSubmit={handleFoodRequestSubmit}>
+        <div className="mb-3">
+          <label htmlFor="foodType" className="form-label">
+            Select Food Type
+          </label>
+          <select
+            id="foodType"
+            className="form-control"
+            value={newFoodRequest.food_type}
+            onChange={(e) => setNewFoodRequest({ ...newFoodRequest, food_type: e.target.value })}
+            required
+          >
+            <option value="">-- Select Food Type --</option>
+            {availableFood.map((food, index) => (
+              <option key={index} value={food.food_type}>
+                {food.food_type}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-3">
+          <label htmlFor="quantity" className="form-label">
+            Quantity
+          </label>
+          <input
+            type="number"
+            id="quantity"
+            className="form-control"
+            value={newFoodRequest.quantity}
+            onChange={(e) => setNewFoodRequest({ ...newFoodRequest, quantity: e.target.value })}
+            placeholder="Enter quantity needed"
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn-primary">
+          Submit Request
+        </button>
+      </form>
 
       {/* Display Food Requests */}
       <h3>Your Food Requests</h3>
@@ -187,7 +200,7 @@ const BeneficiaryDashboard = () => {
             </tr>
           </thead>
           <tbody>
-  {foodRequests.map((request, index) => (
+          {foodRequests.map((request, index) => (
     <tr key={request.request_id || index}>
       <td>{index + 1}</td>
       <td>{request.food_type || 'Unknown'}</td>
@@ -197,15 +210,11 @@ const BeneficiaryDashboard = () => {
     </tr>
   ))}
 </tbody>
-
         </table>
       )}
 
       {/* Profile Update Section */}
-      <button
-        className="btn btn-info mt-4 w-100"
-        onClick={() => setShowProfileUpdate(!showProfileUpdate)}
-      >
+      <button className="btn btn-info mt-4 w-100" onClick={() => setShowProfileUpdate(!showProfileUpdate)}>
         Update Profile
       </button>
       {showProfileUpdate && (
@@ -246,56 +255,52 @@ const BeneficiaryDashboard = () => {
       )}
 
       {/* Password Update Section */}
-<button
-  className="btn btn-warning mt-4 w-100"
-  onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}
->
-  Update Password
-</button>
-{showPasswordUpdate && (
-  <div className="card p-4 mt-3">
-    <h3>Change Password</h3>
-    <form
-      onSubmit={(e) => {
-        e.preventDefault(); // Prevent default form submission
-        handlePasswordUpdate();
-      }}
-    >
-      <div className="mb-3">
-        <label htmlFor="oldPassword" className="form-label">
-          Old Password
-        </label>
-        <input
-          type="password"
-          id="oldPassword"
-          className="form-control"
-          placeholder="Old Password"
-          value={passwords.oldPassword}
-          onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
-          required
-        />
-      </div>
-      <div className="mb-3">
-        <label htmlFor="newPassword" className="form-label">
-          New Password
-        </label>
-        <input
-          type="password"
-          id="newPassword"
-          className="form-control"
-          placeholder="New Password"
-          value={passwords.newPassword}
-          onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
-          required
-        />
-      </div>
-      <button className="btn btn-success mt-3" type="submit">
+      <button className="btn btn-warning mt-4 w-100" onClick={() => setShowPasswordUpdate(!showPasswordUpdate)}>
         Update Password
       </button>
-    </form>
-  </div>
-)}
-
+      {showPasswordUpdate && (
+        <div className="card p-4 mt-3">
+          <h3>Change Password</h3>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handlePasswordUpdate();
+            }}
+          >
+            <div className="mb-3">
+              <label htmlFor="oldPassword" className="form-label">
+                Old Password
+              </label>
+              <input
+                type="password"
+                id="oldPassword"
+                className="form-control"
+                placeholder="Old Password"
+                value={passwords.oldPassword}
+                onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="newPassword" className="form-label">
+                New Password
+              </label>
+              <input
+                type="password"
+                id="newPassword"
+                className="form-control"
+                placeholder="New Password"
+                value={passwords.newPassword}
+                onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                required
+              />
+            </div>
+            <button className="btn btn-success mt-3" type="submit">
+              Update Password
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
