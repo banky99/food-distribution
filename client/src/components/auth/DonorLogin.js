@@ -7,21 +7,21 @@ import '../../styles/Auth.css';
 const DonorLogin = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const navigate = useNavigate();
+  const API_BASE_URL = 'http://localhost:3001';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { email, password } = credentials; // Destructure credentials
-      const response = await axios.post('http://localhost:3000/auth/login', { userType: 'donor', email, password });
+      const { email, password } = credentials;
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, { userType: 'donor', email, password });
 
       if (response.status === 200) {
         alert(response.data.message);
-        localStorage.setItem('token', response.data.token); // Store token for authenticated requests
-        navigate('/donor/dashboard');
+        localStorage.setItem('token', response.data.token); // Store the token securely
+        navigate('/donor/dashboard'); // Redirect to donor dashboard
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.error || 'Donor Login Failed. Please check your credentials and try again.';
+      const errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
       alert(errorMessage);
     }
   };

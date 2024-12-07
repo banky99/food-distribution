@@ -1,5 +1,4 @@
-// src/components/dashboard/AdminDashboard.js
-import React from 'react'; 
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../styles/Dashboard.css';
@@ -22,31 +21,61 @@ const AdminDashboard = () => {
 
       {/* Dashboard Options */}
       <div className="row">
-        <div className="col-md-4">
+        <div className="col-md-3 mb-4">
           <h4>Manage Beneficiaries</h4>
           <button
             className="btn btn-primary btn-block"
-            onClick={() => navigate('/beneficiary')}
+            onClick={() => navigate('/admin/beneficiaries')}
           >
             View Beneficiaries
           </button>
         </div>
-        <div className="col-md-4">
+        <div className="col-md-3 mb-4">
           <h4>Manage Donors</h4>
           <button
             className="btn btn-primary btn-block"
-            onClick={() => navigate('/donor')}
+            onClick={() => navigate('/admin/donors')}
           >
             View Donors
           </button>
         </div>
-        <div className="col-md-4">
+        <div className="col-md-3 mb-4">
           <h4>Manage Volunteers</h4>
           <button
             className="btn btn-primary btn-block"
-            onClick={() => navigate('/volunteer')}
+            onClick={() => navigate('/admin/volunteers')}
           >
             View Volunteers
+          </button>
+        </div>
+        <div className="col-md-3 mb-4">
+          <h4>Manage Food Inventory</h4>
+          <button
+            className="btn btn-primary btn-block"
+            onClick={() => navigate('/admin/food-inventory')}
+          >
+            View Food Inventory
+          </button>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-md-3 mb-4">
+          <h4>Track Donations</h4>
+          <button
+            className="btn btn-primary btn-block"
+            onClick={() => navigate('/admin/donations')}
+          >
+            View Donations
+          </button>
+        </div>
+        <div className="col-md-3 mb-4">
+          <h4>Track Deliveries</h4>
+          <button
+            className="btn btn-primary btn-block"
+            onClick={() => navigate('/admin/deliveries')}
+          >
+            View Deliveries
           </button>
         </div>
       </div>

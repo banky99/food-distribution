@@ -12,7 +12,7 @@ const AdminLogin = () => {
     e.preventDefault();
     try {
       const { email, password } = credentials; 
-      const response = await axios.post('http://localhost:3000/auth/login', { userType: 'admin', email, password });
+      const response = await axios.post('http://localhost:3001/auth/login', { userType: 'admin', email, password });
 
       if (response.status === 200) {
         alert(response.data.message);

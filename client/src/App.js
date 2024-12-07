@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'; 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Removed Link as it's not used
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -32,6 +32,14 @@ import AdminDashboard from './components/dashboard/AdminDashboard';
 import BeneficiaryDashboard from './components/dashboard/BeneficiaryDashboard';
 import DonorDashboard from './components/dashboard/DonorDashboard';
 import VolunteerDashboard from './components/dashboard/VolunteerDashboard';
+
+// Import admin management pages
+import AdminBeneficiariesPage from './components/admin/AdminBeneficiariesPage';
+import AdminDonorsPage from './components/admin/AdminDonorsPage';
+import AdminVolunteersPage from './components/admin/AdminVolunteersPage';
+import AdminFoodInventoryPage from './components/admin/AdminFoodInventoryPage';
+import AdminDonationsPage from './components/admin/AdminDonationsPage';
+import AdminDeliveriesPage from './components/admin/AdminDeliveriesPage';
 
 function App() {
   return (
@@ -69,6 +77,14 @@ function App() {
           <Route path="/beneficiary/dashboard" element={<BeneficiaryDashboard />} />
           <Route path="/donor/dashboard" element={<DonorDashboard />} />
           <Route path="/volunteer/dashboard" element={<VolunteerDashboard />} />
+
+          {/* Admin Management Pages */}
+          <Route path="/admin/beneficiaries" element={<AdminBeneficiariesPage />} />
+          <Route path="/admin/donors" element={<AdminDonorsPage />} />
+          <Route path="/admin/volunteers" element={<AdminVolunteersPage />} />
+          <Route path="/admin/food-inventory" element={<AdminFoodInventoryPage />} />
+          <Route path="/admin/donations" element={<AdminDonationsPage />} />
+          <Route path="/admin/deliveries" element={<AdminDeliveriesPage />} />
         </Routes>
       </div>
 
