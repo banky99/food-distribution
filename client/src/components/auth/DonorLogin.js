@@ -17,7 +17,11 @@ const DonorLogin = () => {
 
       if (response.status === 200) {
         alert(response.data.message);
-        localStorage.setItem('token', response.data.token); // Store the token securely
+
+        // Store donor_id and token in localStorage
+        localStorage.setItem('donor_id', response.data.user.id); // Save the donor_id
+        localStorage.setItem('token', response.data.token); // Save the token (if used)
+
         navigate('/donor/dashboard'); // Redirect to donor dashboard
       }
     } catch (error) {

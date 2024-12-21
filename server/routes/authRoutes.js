@@ -78,9 +78,9 @@ router.post('/login', async (req, res) => {
                 return res.status(401).send({ error: 'Invalid credentials' });
             }
 
-            // Store user data in session
+            // Store user data in session based on user type
             req.session.user = {
-                id: user.beneficiary_id, // Store beneficiary_id explicitly
+                id: user.donor_id || user.beneficiary_id || user.admin_id || user.volunteer_id,// Adjust based on the user type
                 userType,
             };
 
@@ -90,7 +90,7 @@ router.post('/login', async (req, res) => {
                     console.error('Error saving session:', err);
                     return res.status(500).send({ error: 'Session save failed' });
                 }
-                res.send({ message: 'Login successful', user: { id: user.beneficiary_id, userType } });
+                res.send({ message: 'Login successful', user: { id: req.session.user.id, userType } });
             });
         });
     } catch (err) {
@@ -114,7 +114,7 @@ router.post('/logout', (req, res) => {
 router.get('/profile', isAuthenticated, (req, res) => {
     const { userType, id } = req.session.user; // Use `id` from session
     const table = getUserTable(userType); // Validate table name
-    const sql = `SELECT * FROM ${table} WHERE beneficiary_id = ?`; // Match the `beneficiary_id` schema
+    const sql = `SELECT * FROM ${table} WHERE id = ?`; // Match the `id` schema
 
     db.query(sql, [id], (err, result) => {
         if (err) {
@@ -128,20 +128,85 @@ router.get('/profile', isAuthenticated, (req, res) => {
     });
 });
 
+// Contribution Route
 router.post('/contribute', (req, res) => {
-    const { donor_id, food_inventory_id } = req.body;
-    
-    if (!donor_id || !food_inventory_id) {
-        return res.status(400).send({ error: 'Donor ID and Food Inventory ID are required.' });
+    const { donor_id, food_type, quantity, donationDate } = req.body;
+
+    // Validate required fields
+    if (!donor_id || !food_type || !quantity || !donationDate) {
+        return res.status(400).send({ error: 'All fields (donor_id, food_type, quantity, donationDate) are required.' });
     }
 
-    const sql = 'INSERT INTO DonorContributions (donor_id, food_inventory_id, date_contributed) VALUES (?, ?, CURDATE())';
-    db.query(sql, [donor_id, food_inventory_id], (err, result) => {
+    // Start a transaction
+    db.beginTransaction((err) => {
         if (err) {
-            return res.status(500).send({ error: 'Database error: ' + err.message });
+            return res.status(500).send({ error: 'Failed to start transaction: ' + err.message });
         }
 
-        res.status(201).send({ message: 'Contribution recorded successfully', contributionId: result.insertId });
+        // Check if the food item already exists in FoodInventory
+        const checkFoodSql = 'SELECT inventory_id, quantity FROM FoodInventory WHERE food_type = ?';
+        db.query(checkFoodSql, [food_type], (err, results) => {
+            if (err) {
+                return db.rollback(() => {
+                    res.status(500).send({ error: 'Database error while checking food item: ' + err.message });
+                });
+            }
+
+            let food_inventory_id;
+            let newQuantity = quantity;
+
+            if (results.length > 0) {
+                // If the food exists, update the stock quantity
+                food_inventory_id = results[0].inventory_id;
+                newQuantity = results[0].quantity + quantity;
+
+                const updateInventorySql = 'UPDATE FoodInventory SET quantity = ? WHERE inventory_id = ?';
+                db.query(updateInventorySql, [newQuantity, food_inventory_id], (err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            res.status(500).send({ error: 'Database error while updating FoodInventory: ' + err.message });
+                        });
+                    }
+                    insertDonation();
+                });
+            } else {
+                // If the food doesn't exist, insert a new record in FoodInventory
+                const insertInventorySql = 'INSERT INTO FoodInventory (food_type, quantity) VALUES (?, ?)';
+                db.query(insertInventorySql, [food_type, quantity], (err, result) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            res.status(500).send({ error: 'Database error while inserting FoodInventory: ' + err.message });
+                        });
+                    }
+
+                    food_inventory_id = result.insertId; // Get the newly created food inventory ID
+                    insertDonation();
+                });
+            }
+
+            // Function to insert donation into DonorContributions table
+            function insertDonation() {
+                const contributionSql = 'INSERT INTO DonorContributions (donor_id, food_inventory_id, date_contributed, quantity) VALUES (?, ?, ?, ?)';
+                db.query(contributionSql, [donor_id, food_inventory_id, donationDate, quantity], (err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            res.status(500).send({ error: 'Database error while inserting donation: ' + err.message });
+                        });
+                    }
+
+                    // Commit transaction if both the inventory and donation were successfully added
+                    db.commit((err) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                res.status(500).send({ error: 'Failed to commit transaction: ' + err.message });
+                            });
+                        }
+
+                        res.status(201).send({ message: 'Contribution recorded successfully' });
+                    });
+                });
+            }
+        });
     });
 });
 
@@ -154,12 +219,11 @@ router.get('/donor/:donor_id', (req, res) => {
         JOIN FoodInventory fi ON dc.food_inventory_id = fi.inventory_id
         WHERE dc.donor_id = ?
     `;
-    
     db.query(sql, [donor_id], (err, results) => {
         if (err) {
             return res.status(500).send({ error: 'Database error: ' + err.message });
         }
-        
+
         if (results.length === 0) {
             return res.status(404).send({ message: 'No donations found for this donor.' });
         }
@@ -167,7 +231,5 @@ router.get('/donor/:donor_id', (req, res) => {
         res.send(results);
     });
 });
-
-
 
 module.exports = router;

@@ -6,7 +6,6 @@ const dotenv = require('dotenv');
 const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store); 
 const sequelize = require('./sequelize');  
-
 dotenv.config(); 
 
 const app = express();
@@ -76,6 +75,7 @@ const communityGardenRoutes = require('./routes/communityGardenRoutes');
 const authRoutes = require('./routes/authRoutes'); 
 const profileRoutes = require('./routes/profileRoutes');
 const foodRoutes = require('./routes/foodRoutes')
+const donationsRoute = require('./routes/donations');
 
 // Use routes for each entity
 app.use('/auth', authRoutes);  
@@ -89,6 +89,7 @@ app.use('/food-requests', foodRequestRoutes);
 app.use('/community-gardens', communityGardenRoutes);
 app.use(profileRoutes);
 app.use(foodRoutes);
+app.use(donationsRoute);
 
 // Default route for health check
 app.get('/', (req, res) => {

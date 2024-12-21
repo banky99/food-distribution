@@ -5,39 +5,62 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../../styles/Dashboard.css';
 
 const DonorDashboard = () => {
-  const [donations, setDonations] = useState([]); // Holds donation history
+  const [donations, setDonations] = useState([]); 
   const [donationData, setDonationData] = useState({
-    foodType: '',
+    donor_id: '',          
+    food_type: '',         
     quantity: '',
     donationDate: '',
-  }); // Holds new donation data
-  const API_BASE_URL = 'http://localhost:3001'; // Update with your API base URL
+  });
+  const API_BASE_URL = 'http://localhost:3001'; 
   const navigate = useNavigate();
 
   // Fetch donations for the logged-in donor
   useEffect(() => {
     const fetchDonations = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/donations`, {
+        const storedDonorId = localStorage.getItem('donor_id');
+        if (!storedDonorId) {
+          alert('Session expired. Please log in again.');
+          navigate('/donor/login');
+          return;
+        }
+        const response = await axios.get(`${API_BASE_URL}/donor/${storedDonorId}/donations`, {
           withCredentials: true,
         });
         setDonations(response.data);
       } catch (error) {
-        console.error('Error fetching donations:', error);
+        console.error('Error fetching donations:', error.response?.data || error.message);
       }
     };
     fetchDonations();
+  }, [navigate]);
+
+  // Retrieve donor_id from local storage
+  useEffect(() => {
+    const storedDonorId = localStorage.getItem('donor_id');
+    if (storedDonorId) {
+      setDonationData((prev) => ({ ...prev, donor_id: storedDonorId }));
+    }
   }, []);
 
   // Handle donation form submission
   const handleDonationSubmit = async (e) => {
     e.preventDefault();
+    console.log('Donation data being submitted:', donationData);
+    const { donor_id, food_type, quantity, donationDate } = donationData;
     try {
-      const response = await axios.post(`${API_BASE_URL}/donations`, donationData, {
+      const response = await axios.post(`${API_BASE_URL}/auth/contribute`, {
+        donor_id,
+        food_type,           
+        quantity,
+        donationDate
+      }, {
         withCredentials: true,
       });
+
       setDonations((prev) => [...prev, response.data]); // Add new donation to list
-      setDonationData({ foodType: '', quantity: '', donationDate: '' }); // Reset form
+      setDonationData((prev) => ({ ...prev, food_type: '', quantity: '', donationDate: '' })); // Reset form
       alert('Donation successfully recorded!');
     } catch (error) {
       console.error('Error recording donation:', error);
@@ -49,7 +72,7 @@ const DonorDashboard = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
-      localStorage.removeItem('donorToken'); // Remove token if stored
+      localStorage.removeItem('donor_id'); // Remove donor ID
       navigate('/donor/login');
     } catch (error) {
       console.error('Logout error:', error);
@@ -78,8 +101,8 @@ const DonorDashboard = () => {
           <input
             type="text"
             className="form-control"
-            name="foodType"
-            value={donationData.foodType}
+            name="food_type"
+            value={donationData.food_type}
             onChange={handleInputChange}
             required
           />
@@ -117,9 +140,9 @@ const DonorDashboard = () => {
         <ul className="list-group mt-3">
           {donations.map((donation, index) => (
             <li className="list-group-item" key={index}>
-              <strong>Food Type:</strong> {donation.foodType} |{' '}
+              <strong>Food Type:</strong> {donation.food_type} |{' '}
               <strong>Quantity:</strong> {donation.quantity} units |{' '}
-              <strong>Date:</strong> {new Date(donation.donationDate).toLocaleDateString()}
+              <strong>Date:</strong> {donation.donationDate ? new Date(donation.donationDate).toLocaleDateString() : 'N/A'}
             </li>
           ))}
         </ul>
